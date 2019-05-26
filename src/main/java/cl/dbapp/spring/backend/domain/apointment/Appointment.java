@@ -7,8 +7,8 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "APOINTMENT")
-public class Apointment {
+@Table(name = "APPOINTMENT")
+public class Appointment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -29,7 +29,9 @@ public class Apointment {
     @Column(name = "RESERVED")
     private Boolean reserved;
 
-    public Apointment(Clinic clinic, Date date, RegisteredUser doctor, Boolean reserved) {
+    public Appointment() { }
+
+    public Appointment(Clinic clinic, Date date, RegisteredUser doctor, Boolean reserved) {
         this.clinic = clinic;
         this.date = date;
         this.doctor = doctor;

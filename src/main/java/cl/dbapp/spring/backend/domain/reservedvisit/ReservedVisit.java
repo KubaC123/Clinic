@@ -1,6 +1,6 @@
 package cl.dbapp.spring.backend.domain.reservedvisit;
 
-import cl.dbapp.spring.backend.domain.apointment.Apointment;
+import cl.dbapp.spring.backend.domain.apointment.Appointment;
 import cl.dbapp.spring.backend.domain.registereduser.RegisteredUser;
 
 import javax.persistence.*;
@@ -20,13 +20,13 @@ public class ReservedVisit {
 
     @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @JoinColumn(name = "APOINTMENT_ID", nullable = false)
-    private Apointment apointment;
+    private Appointment appointment;
 
     public ReservedVisit() { }
 
-    public ReservedVisit(RegisteredUser patient, Apointment apointment) {
+    public ReservedVisit(RegisteredUser patient, Appointment appointment) {
         this.patient = patient;
-        this.apointment = apointment;
+        this.appointment = appointment;
     }
 
     public Long getId() {
@@ -41,11 +41,11 @@ public class ReservedVisit {
         this.patient = patient;
     }
 
-    public Apointment getApointment() {
-        return apointment;
+    public Appointment getAppointment() {
+        return appointment;
     }
 
-    public void setApointment(Apointment apointment) {
-        this.apointment = apointment;
+    public void setAppointment(Appointment appointment) {
+        this.appointment = appointment;
     }
 }

@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 @EnableVaadin
 public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
 
-    private static final String HOME_PATH = "/" + Menu.HOME_PATH;
+    private static final String HOME_PATH = "/" + Menu.HOME_ROUTE;
     private static final String REGISTERED_VISIT_PATH = "/" + Menu.REGISTERED_VISIT_ROUTE;
 
     @Override
