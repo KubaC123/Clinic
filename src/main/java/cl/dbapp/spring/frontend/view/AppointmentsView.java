@@ -52,7 +52,7 @@ public class AppointmentsView extends VerticalLayout {
     private static final String ACTION_HEADER = "Actions";
 
     private static final int LONG_NOTIFICATION_DURATION = 4500;
-    private static final int SHORT_NOTIFICATION_DURATION = 1200;
+    private static final int SHORT_NOTIFICATION_DURATION = 1500;
     private static final String SELECTED_VISIT_MSG = "You selected appointment at {0}, in {1}, with Doctor {2}.";
     private static final String AVAILABLE_APPOINTMENTS_MSG = "Found {0} available appointments.";
     private static final String APPOINTMENT_RESERVED_MSG = "Appointment reserved :)";
