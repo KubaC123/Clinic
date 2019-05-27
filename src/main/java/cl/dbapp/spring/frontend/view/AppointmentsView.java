@@ -42,7 +42,8 @@ import java.util.stream.Stream;
 public class AppointmentsView extends VerticalLayout {
 
     private static final String BROWSE_APPOINTMENTS_CLASS = "browse-appointments";
-    private static final String MENU_BUTTON = "Menu";
+    private static final String RESERVE_BUTTON_CLASS = "reserve-button";
+    private static final String MENU_BUTTON = "menu";
     private static final String RESERVE_BUTTON = "Reserve";
     private static final String CLINIC_HEADER = "Clinic";
     private static final String SPECIALITY_HEADER = "Speciality";
@@ -54,10 +55,9 @@ public class AppointmentsView extends VerticalLayout {
     private static final int SHORT_NOTIFICATION_DURATION = 1200;
     private static final String SELECTED_VISIT_MSG = "You selected appointment at {0}, in {1}, with Doctor {2}.";
     private static final String AVAILABLE_APPOINTMENTS_MSG = "Found {0} available appointments.";
-    private static final String NO_SELECTED_APPOINTMENT_MSG = "No selected appointment :(";
     private static final String APPOINTMENT_RESERVED_MSG = "Appointment reserved :)";
-    public static final String DATE_WITH_TIME_PATTERN = "dd-MM-yyyy HH:mm";
-    public static final String DATE_PATTERN = "dd-MM-yyyy";
+    private static final String DATE_WITH_TIME_PATTERN = "dd-MM-yyyy HH:mm";
+    private static final String DATE_PATTERN = "dd-MM-yyyy";
 
     private static SimpleDateFormat DATE_FORMAT_WITH_TIME;
     private static SimpleDateFormat DATE_FORMAT;
@@ -208,7 +208,7 @@ public class AppointmentsView extends VerticalLayout {
 
     private void setAppointmentNotification() {
         appointmentNotification = new Notification();
-        appointmentNotification.setPosition(Notification.Position.BOTTOM_END);
+        appointmentNotification.setPosition(Notification.Position.BOTTOM_START);
     }
 
     private void setAppointmentsGrid() {
@@ -217,12 +217,16 @@ public class AppointmentsView extends VerticalLayout {
 
         Grid.Column<Appointment> clinicColumn = appointmentsGrid
                 .addColumn(appointment -> appointment.getClinic().getName()).setHeader(CLINIC_HEADER);
+
         Grid.Column<Appointment> specialityColumn = appointmentsGrid
                 .addColumn(appointment -> appointment.getDoctor().getSpeciality()).setHeader(SPECIALITY_HEADER);
+
         Grid.Column<Appointment> doctorName = appointmentsGrid
                 .addColumn(appointment -> appointment.getDoctor().getName() + " " + appointment.getDoctor().getLastName()).setHeader(DOCTOR_HEADER);
+
         Grid.Column<Appointment> dateColumn = appointmentsGrid
                 .addColumn(appointment -> DATE_FORMAT_WITH_TIME.format(appointment.getDate())).setHeader(DATE_HEADER);
+
         appointmentsGrid.addComponentColumn(appointment -> createReserveButton(appointmentsGrid, appointment))
                 .setHeader(ACTION_HEADER);
 
@@ -233,12 +237,13 @@ public class AppointmentsView extends VerticalLayout {
     private Button createReserveButton(Grid<Appointment> appointmentsGrid, Appointment appointment) {
         Button reserveButton = new Button(RESERVE_BUTTON, new Icon(VaadinIcon.CHECK));
         reserveButton.addClickListener(click -> {
-            reservedVisitRepository.save(new ReservedVisit(currentUser, appointment));
+            reservedVisitRepository.save(new ReservedVisit(currentUser, appointment, Boolean.TRUE));
             appointment.setReserved(Boolean.TRUE);
             appointmentRepository.save(appointment);
             showReserveAppointmentsNotification(APPOINTMENT_RESERVED_MSG);
             appointmentsGrid.setItems(filterAppointmentsWithSearchCriteria());
         });
+        reserveButton.setClassName(RESERVE_BUTTON_CLASS);
         return reserveButton;
     }
 

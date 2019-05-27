@@ -32,6 +32,9 @@ public class RegisteredUser {
     @Column(name = "SPECIALITY")
     private String speciality;
 
+    @Column(name = "DESCRIPTION")
+    private String description;
+
     public RegisteredUser() { }
 
     public RegisteredUser(String oktaSub, String name, String lastName, String eMail, String userType) {
@@ -100,5 +103,13 @@ public class RegisteredUser {
 
     public void setSpeciality(String speciality) {
         this.speciality = speciality;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 }

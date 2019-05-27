@@ -22,11 +22,15 @@ public class ReservedVisit {
     @JoinColumn(name = "APOINTMENT_ID", nullable = false)
     private Appointment appointment;
 
+    @Column(name = "ACTIVE")
+    private Boolean active;
+
     public ReservedVisit() { }
 
-    public ReservedVisit(RegisteredUser patient, Appointment appointment) {
+    public ReservedVisit(RegisteredUser patient, Appointment appointment, Boolean active) {
         this.patient = patient;
         this.appointment = appointment;
+        this.active = active;
     }
 
     public Long getId() {
@@ -47,5 +51,13 @@ public class ReservedVisit {
 
     public void setAppointment(Appointment appointment) {
         this.appointment = appointment;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 }

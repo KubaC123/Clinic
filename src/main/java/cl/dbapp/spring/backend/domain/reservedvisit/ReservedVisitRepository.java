@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ReservedVisitRepository extends JpaRepository<ReservedVisit, Long> {
 
-    List<ReservedVisit> findReservedVisitByPatient(RegisteredUser registeredUser);
+    List<ReservedVisit> findReservedVisitByPatientAndActive(RegisteredUser registeredUser, Boolean active);
 }
