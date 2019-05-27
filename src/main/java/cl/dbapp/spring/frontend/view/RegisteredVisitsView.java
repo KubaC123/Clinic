@@ -7,7 +7,6 @@ import cl.dbapp.spring.backend.domain.reservedvisit.ReservedVisitRepository;
 import cl.dbapp.spring.frontend.user.UserContext;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
@@ -17,7 +16,7 @@ import com.vaadin.flow.router.Route;
 import java.util.List;
 
 @Route(Menu.REGISTERED_VISIT_ROUTE)
-public class RegisteredVisitView extends VerticalLayout {
+public class RegisteredVisitsView extends VerticalLayout {
 
     private static final String NO_RESERVED_VISIT_MSG = "You have not yet registered any appointments. Look for a free date by selecting the 'Browse appointments' option from the main menu.";
     private static final String MENU_BUTTON = "menu";
@@ -29,49 +28,49 @@ public class RegisteredVisitView extends VerticalLayout {
     private final RegisteredUser currentUser;
 
     private Button backToMenuButton;
-    private Grid<ReservedVisit> reservedVisitGrid;
-    private Notification noReservedVisitNotification;
+    private Grid<ReservedVisit> reservedVisitsGrid;
+    private Notification noReservedVisitsNotification;
 
     private List<ReservedVisit> reservedVisits;
 
-    public RegisteredVisitView(RegisteredUserRepository registeredUserRepository, ReservedVisitRepository reservedVisitRepository) {
+    public RegisteredVisitsView(RegisteredUserRepository registeredUserRepository, ReservedVisitRepository reservedVisitRepository) {
         this.registeredUserRepository = registeredUserRepository;
         this.reservedVisitRepository = reservedVisitRepository;
         this.currentUser = UserContext.getUser(registeredUserRepository);
         this.reservedVisits = reservedVisitRepository.findReservedVisitByPatient(currentUser);
 
-        backToMenuButton();
-        reservedVisitGrid();
-        noReservedVisitNotification();
+        setBackToMenuButton();
+        setReservedVisitGrid();
+        setNoReservedVisitNotification();
 
         add(backToMenuButton);
         if(reservedVisits.isEmpty()) {
-            noReservedVisitNotification.open();
+            noReservedVisitsNotification.open();
         } else {
-            add(reservedVisitGrid);
+            add(reservedVisitsGrid);
         }
         setSizeFull();
     }
 
-    private void reservedVisitGrid() {
-        reservedVisitGrid = new Grid<>(ReservedVisit.class);
-        reservedVisitGrid.setItems(reservedVisits);
+    private void setReservedVisitGrid() {
+        reservedVisitsGrid = new Grid<>(ReservedVisit.class);
+        reservedVisitsGrid.setItems(reservedVisits);
     }
 
-    private void backToMenuButton() {
+    private void setBackToMenuButton() {
         backToMenuButton = new Button(MENU_BUTTON, new Icon(VaadinIcon.ANGLE_LEFT));
         backToMenuButton.addClickListener(click -> {
-            noReservedVisitNotification.close();
+            noReservedVisitsNotification.close();
             backToMenuButton.getUI().ifPresent(ui -> ui.navigate(Menu.HOME_ROUTE));
         });
         backToMenuButton.setAutofocus(Boolean.TRUE);
     }
 
-    private void noReservedVisitNotification() {
-        Label information = new Label(NO_RESERVED_VISIT_MSG);
-        noReservedVisitNotification = new Notification(information);
-        noReservedVisitNotification.setDuration(NOTIFICATION_DURATION);
-        noReservedVisitNotification.setPosition(Notification.Position.MIDDLE);
+    private void setNoReservedVisitNotification() {
+        noReservedVisitsNotification = new Notification();
+        noReservedVisitsNotification.setDuration(NOTIFICATION_DURATION);
+        noReservedVisitsNotification.setPosition(Notification.Position.MIDDLE);
+        noReservedVisitsNotification.setText(NO_RESERVED_VISIT_MSG);
     }
 
 }

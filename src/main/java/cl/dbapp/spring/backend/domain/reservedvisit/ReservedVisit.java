@@ -14,11 +14,11 @@ public class ReservedVisit {
     @Column(name = "ID", updatable = false, nullable = false)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "PATIENT_ID", nullable = false)
     private RegisteredUser patient;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "APOINTMENT_ID", nullable = false)
     private Appointment appointment;
 

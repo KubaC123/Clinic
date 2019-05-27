@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@Table(name = "APPOINTMENT")
+@Table(name = "APOINTMENT")
 public class Appointment {
 
     @Id
@@ -15,14 +15,14 @@ public class Appointment {
     @Column(name = "ID", updatable = false, nullable = false)
     private Long id;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "CLINIC_ID", nullable = false)
     private Clinic clinic;
 
     @Column(name = "DATE")
     private Date date;
 
-    @ManyToOne(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "DOCTOR_ID", nullable = false)
     private RegisteredUser doctor;
 

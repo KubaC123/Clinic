@@ -23,6 +23,8 @@ public class Clinic {
     @Column(name = "STREET_NUMBER")
     private String streetNumber;
 
+    public Clinic() { }
+
     public Clinic(String name, String city, String street, String streetNumber) {
         this.name = name;
         this.city = city;
