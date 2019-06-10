@@ -1,0 +1,93 @@
+.main-menu h1 {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    color: darkblue;
+    background-color: cornflowerblue;
+}
+
+.browse-appointments h1 {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    color: darkblue;
+    background-color: cornflowerblue;
+}
+
+.reserved-visits h1 {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    color: darkblue;
+    background-color: cornflowerblue;
+}
+
+.myprofile-view h1 {
+    width: 100%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+    color: darkblue;
+    background-color: cornflowerblue;
+}
+
+.menu-button {
+    width: 40%;
+    height: 100px;
+    background: lightblue;
+    color: darkblue;
+}
+
+.cancel-button {
+    background-color: red;
+    color: white;
+}
+
+.reserve-button {
+    background-color: green;
+    color: white;
+}
+
+.invalid-textfield {
+    color: red;
+}
+
+.valid-textfield {
+    color: lightskyblue;
+}
+
+.save-button {
+    background-color: green;
+    color: white;
+}
+
+.yes-button {
+    background-color: green;
+    color: white;
+    margin-left: auto;
+}
+
+.no-button {
+    background-color: red;
+    color: white;
+    margin-right: auto;
+}
+
+.label {
+    display: block;
+    text-align: center;
+    margin: auto;
+    margin-top: 10px;
+    background-color: lightskyblue;
+}
+
+.history {
+    width: 50%;
+    background-color: lightsteelblue;
+    margin: auto;
+}
+
+
