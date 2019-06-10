@@ -40,7 +40,6 @@ public class Menu extends VerticalLayout {
         addClassName(MENU_CLASS);
         applicationHeader();
         registeredVisitButton();
-        browseClinicButton();
         browseAppointmentButton();
         myProfileButton();
         add(appHeader);
@@ -62,14 +61,6 @@ public class Menu extends VerticalLayout {
             registeredVisitButton.getUI().ifPresent(ui -> ui.navigate(REGISTERED_VISIT_ROUTE));
         });
         menuButtons.add(registeredVisitButton);
-    }
-
-    private void browseClinicButton() {
-        Button browseClinicButton = new Button(BROWSE_CLINIC, new Icon(VaadinIcon.BUILDING));
-        browseClinicButton.addClickListener(click -> {
-            browseClinicButton.getUI().ifPresent(ui -> ui.navigate(BROWSE_CLINICS_ROUTE));
-        });
-        menuButtons.add(browseClinicButton);
     }
 
     private void browseAppointmentButton() {

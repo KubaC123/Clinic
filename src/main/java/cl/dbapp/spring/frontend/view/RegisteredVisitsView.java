@@ -10,17 +10,20 @@ import cl.dbapp.spring.backend.domain.reservedvisit.ReservedVisitRepository;
 import cl.dbapp.spring.frontend.user.UserContext;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.Route;
-import org.atmosphere.interceptor.AtmosphereResourceStateRecovery;
 
 import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 @Route(Menu.REGISTERED_VISIT_ROUTE)
@@ -29,8 +32,10 @@ public class RegisteredVisitsView extends VerticalLayout {
 
     private static final String RESERVED_VISITS_CLASS = "reserved-visits";
     private static final String CANCEL_BUTTON_CLASS = "cancel-button";
+    private static final String YES_BUTTON_CLASS = "yes-button";
+    private static final String NO_BUTTON_CLASS = "no-button";
 
-    private static final String NO_RESERVED_VISIT_MSG = "You have not yet registered any appointments. Look for a free date by selecting the 'Browse appointments' option from the main menu.";
+    private static final String NO_RESERVED_VISIT_MSG = "You have no upcoming appointments. Look for a free date by selecting the 'Browse appointments' option from the main menu.";
     private static final String CANCEL_SUCCEDED = "Appointment canceled.";
 
     private static final String MENU_BUTTON = "menu";
@@ -40,7 +45,7 @@ public class RegisteredVisitsView extends VerticalLayout {
     private static final String ADDRESS_HEADER = "Address";
     private static final String DATE_HEADER = "Date";
     private static final String ACTION_HEADER = "Actions";
-    private static final int NOTIFICATION_DURATION = 1000000;
+    private static final int NOTIFICATION_DURATION = 10000;
     private static final int SHORT_NOTIFICATION_DURATION = 1200;
     private static final String DATE_WITH_TIME_PATTERN = "dd-MM-yyyy HH:mm";
 
@@ -50,11 +55,18 @@ public class RegisteredVisitsView extends VerticalLayout {
     private final AppointmentRepository appointmentRepository;
     private final RegisteredUser currentUser;
 
+    private Date todayDate = new Date(System.currentTimeMillis());
+    private String today;
+
+    private ReservedVisit visitToCanel = new ReservedVisit();
+
     private H1 appHeader;
     private Button backToMenuButton;
     private Grid<ReservedVisit> reservedVisitGrid;
+    private Grid<ReservedVisit> historyVisitGrid;
     private Notification cancelNotification;
     private Notification noReservedVisitsNotification;
+    private Dialog confirmationDialog;
 
     private List<ReservedVisit> reservedVisits;
 
@@ -66,11 +78,14 @@ public class RegisteredVisitsView extends VerticalLayout {
         this.currentUser = UserContext.getUser(registeredUserRepository);
         this.reservedVisits = reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE);
         DATE_FORMAT_WITH_TIME = new SimpleDateFormat(DATE_WITH_TIME_PATTERN);
+        this.today = DATE_FORMAT_WITH_TIME.format(todayDate);
 
         setApplicationHeader();
         setBackToMenuButton();
         setCancelNotification();
+        setConfirmationDialog();
         setReservedVisitGrid();
+        setHistoryVisitGrid();
         setNoReservedVisitNotification();
 
         addComponentAsFirst(appHeader);
@@ -78,8 +93,15 @@ public class RegisteredVisitsView extends VerticalLayout {
         if(reservedVisits.isEmpty()) {
             noReservedVisitsNotification.open();
         } else {
+            Label label1 = new Label("Your upcoming visits");
+            label1.setClassName("label");
+            add(label1);
             add(reservedVisitGrid);
         }
+        Label label2 = new Label("Your past visits");
+        label2.setClassName("label");
+        add(label2);
+        add(historyVisitGrid);
         setSizeFull();
     }
 
@@ -104,9 +126,43 @@ public class RegisteredVisitsView extends VerticalLayout {
         cancelNotification.setPosition(Notification.Position.BOTTOM_START);
     }
 
+    private void setConfirmationDialog() {
+        confirmationDialog = new Dialog(new Label("Do you really want to cancel this visit?"));
+        confirmationDialog.setCloseOnEsc(false);
+        confirmationDialog.setCloseOnOutsideClick(false);
+        Button confirmButton = new Button("Yes", new Icon(VaadinIcon.CHECK_CIRCLE));
+        Button cancelButton = new Button("No", new Icon(VaadinIcon.CLOSE));
+
+        HorizontalLayout buttonsLayout = new HorizontalLayout(confirmButton, cancelButton);
+
+        cancelButton.addClickListener(buttonClick2 -> confirmationDialog.close());
+
+        confirmButton.addClickListener(buttonClick -> {
+            confirmationDialog.close();
+            Appointment appointmentToFree = visitToCanel.getAppointment();
+            appointmentToFree.setReserved(Boolean.FALSE);
+            appointmentRepository.save(appointmentToFree);
+            visitToCanel.setActive(Boolean.FALSE);
+            reservedVisitRepository.save(visitToCanel);
+            reservedVisitGrid.setItems(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE));
+            confirmationDialog.close();
+            if(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE).isEmpty()) {
+                noReservedVisitsNotification.open();
+            } else {
+                cancelNotification.open();
+            }
+        });
+        confirmButton.setClassName(YES_BUTTON_CLASS);
+        cancelButton.setClassName(NO_BUTTON_CLASS);
+        confirmButton.setAutofocus(Boolean.TRUE);
+        cancelButton.setAutofocus(Boolean.TRUE);
+        confirmationDialog.add(buttonsLayout);
+    }
+
     private void setReservedVisitGrid() {
         reservedVisitGrid = new Grid<>();
-        reservedVisitGrid.setItems(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE));
+        reservedVisitGrid.setItems(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE).stream()
+        .filter(reservedVisit -> reservedVisit.getAppointment().getDate().compareTo(todayDate) > 0));
 
         Grid.Column<ReservedVisit> doctorColumn = reservedVisitGrid
                 .addColumn(reservedVisit -> {
@@ -126,29 +182,41 @@ public class RegisteredVisitsView extends VerticalLayout {
                     return MessageFormat.format("{0}, {1} {2}", clinic.getCity(), clinic.getStreet(), clinic.getStreetNumber());
                 }).setHeader(ADDRESS_HEADER);
 
-        reservedVisitGrid.addComponentColumn(reservedVisit -> createCancelButton(reservedVisitGrid, reservedVisit))
+        reservedVisitGrid.addComponentColumn(reservedVisit -> createCancelButton(reservedVisit))
                 .setHeader(ACTION_HEADER);
 
         reservedVisitGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
     }
 
-    private Button createCancelButton(Grid<ReservedVisit> reservedVisitGrid, ReservedVisit visitToCancel) {
+    private Button createCancelButton(ReservedVisit visitToCancel) {
         Button cancelButton = new Button(CANCEL_BUTTON, new Icon(VaadinIcon.MINUS_CIRCLE));
         cancelButton.addClickListener(click -> {
-            Appointment appointmentToFree = visitToCancel.getAppointment();
-            appointmentToFree.setReserved(Boolean.FALSE);
-            appointmentRepository.save(appointmentToFree);
-            visitToCancel.setActive(Boolean.FALSE);
-            reservedVisitRepository.save(visitToCancel);
-            reservedVisitGrid.setItems(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE));
-            if(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE).isEmpty()) {
-                noReservedVisitsNotification.open();
-            } else {
-                cancelNotification.open();
-            }
+            this.visitToCanel = visitToCancel;
+            confirmationDialog.open();
         });
         cancelButton.setClassName(CANCEL_BUTTON_CLASS);
         return cancelButton;
+    }
+
+    private void setHistoryVisitGrid() {
+        historyVisitGrid = new Grid<>();
+        historyVisitGrid.setItems(reservedVisitRepository.findReservedVisitByPatientAndActive(currentUser, Boolean.TRUE).stream()
+        .filter(reservedVisit -> reservedVisit.getAppointment().getDate().compareTo(todayDate) < 0));
+
+        Grid.Column<ReservedVisit> doctorColumn = historyVisitGrid
+                .addColumn(reservedVisit -> {
+                    RegisteredUser doctor = reservedVisit.getAppointment().getDoctor();
+                    return MessageFormat.format("{0} {1} {2}", doctor.getSpeciality(), doctor.getName(), doctor.getLastName());
+                }).setHeader(DOCTOR_HEADER);
+
+        Grid.Column<ReservedVisit> dateColumn = historyVisitGrid
+                .addColumn(reservedVisit -> DATE_FORMAT_WITH_TIME.format(reservedVisit.getAppointment().getDate())).setHeader(DATE_HEADER);
+
+        Grid.Column<ReservedVisit> clinicColumn = historyVisitGrid
+                .addColumn(reservedVisit -> reservedVisit.getAppointment().getClinic().getName()).setHeader(CLINIC_HEADER);
+
+        historyVisitGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        historyVisitGrid.setClassName("history");
     }
 
     private void setNoReservedVisitNotification() {
